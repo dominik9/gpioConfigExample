@@ -2,6 +2,8 @@
 #include "buttonsControl.h"
 #include "configiniread.h"
 #include "driver/gpio.h"
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h"
 
 #define DEFAULT_LED1_PIN    4
 #define DEFAULT_LED2_PIN    16
@@ -17,11 +19,14 @@ led_configuration * led_configuration_tab[3] = {&led1, &led2, &led3};
 
 led_warnings_log setupLedPinsFromFile(void);
 led_warnings_log setupLed(leds_ini_sw led_num);
+void createAllLedTimers(void);
 void setupLedGPIO(void);
-void led_off(uint8_t num_led);
-void led_on(uint8_t num_led);
-void led_slow_flashing(uint8_t num_led);
-void led_fast_flashing(uint8_t num_led); 
+void ledOff(uint8_t num_led);
+void ledOn(uint8_t num_led);
+void ledSlowFlashing(uint8_t num_led);
+void ledFastFlashing(uint8_t num_led); 
+
+void ledsTimerCallback(TimerHandle_t xTimer);
 
 led_warnings_log setupLedPinsFromFile(){
     for(uint8_t i = 0; i < NUMBER_OF_LEDS;i++){
@@ -60,6 +65,10 @@ led_warnings_log setupLed(leds_ini_sw led_num){
     return status;
 }
 
+void createAllLedTimers(void){
+
+}
+
 void setupLedGPIO(void){
     for (uint8_t i = 0; i < NUMBER_OF_LEDS; i++){
         gpio_pad_select_gpio(led_configuration_tab[i]->led_pin);
@@ -68,25 +77,31 @@ void setupLedGPIO(void){
     }
 }
 
-void led_off(uint8_t num_led){
+void ledOff(uint8_t num_led){
+    gpio_set_level(led_configuration_tab[num_led]->led_pin, 0);
+}
+
+void ledOn(uint8_t num_led){
+    gpio_set_level(led_configuration_tab[num_led]->led_pin, 1);
+}
+
+void ledsTimerCallback(TimerHandle_t xTimer){
 
 }
 
-void led_on(uint8_t num_led){
 
+void ledSlowFlashing(uint8_t num_led){
+    //Timers start
 }
 
-void led_slow_flashing(uint8_t num_led){
-
-}
-
-void led_fast_flashing(uint8_t num_led){
-    
+void ledFastFlashing(uint8_t num_led){
+    //Timers start
 } 
 
 led_warnings_log initLedsFromFileIni(){
     setupLedPinsFromFile();
     setupLedGPIO();
+    createAllLedTimers();
     return LED_OK;
 }
 
@@ -97,19 +112,19 @@ led_warnings_log changeStage(uint8_t num_led){
     }
     switch(led_configuration_tab[num_led]->stage){
         case LED_STAGE_OFF:
-            led_off(num_led);
+            ledOff(num_led);
             led_configuration_tab[num_led]->stage = LED_STAGE_ON;
             break;
         case LED_STAGE_ON:
-            led_on(num_led);
+            ledOn(num_led);
             led_configuration_tab[num_led]->stage = LED_STAGE_SLOW_FLASHING;
             break;
         case LED_STAGE_SLOW_FLASHING:
-            led_slow_flashing(num_led);
+            ledSlowFlashing(num_led);
             led_configuration_tab[num_led]->stage = LED_STAGE_SLOW_FLASHING;
             break;
         case LED_STAGE_FAST_FLASHING:
-            led_fast_flashing(num_led);
+            ledFastFlashing(num_led);
             break;
         default:
             led_configuration_tab[num_led]->stage = 0;
