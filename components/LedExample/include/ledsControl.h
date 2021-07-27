@@ -11,6 +11,8 @@ Inicjalizacja przez config wszystkich na raz
 #define _LEDS_CONROL_H
 
 #include <stdint.h>
+#include "freertos/FreeRTOS.h"
+#include "freertos/timers.h"
 
 #define LOGS_LED_ACTIVE
 
@@ -33,6 +35,7 @@ typedef enum{
     LED_INIT_PINS,
     LED_INIT_PIN_NOT_FOUND_IN_FILE,
     LED_NUM_PIN_ERROR,
+    LED_CONFIG_TIMERS_ERROR
 }led_warnings_log;
 
 typedef enum{
@@ -46,6 +49,8 @@ typedef enum{
 typedef struct {
     uint8_t led_pin;
     led_stage stage;
+    TimerHandle_t timer_handle;
+    uint8_t actual_level;
 }led_configuration;
 
 led_warnings_log initLedsFromFileIni();
