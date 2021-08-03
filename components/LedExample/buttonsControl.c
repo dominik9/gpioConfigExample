@@ -1,7 +1,6 @@
 #include "buttonsControl.h"
 #include "freertos/FreeRTOS.h"
 #include "freertos/queue.h"
-#include "exampleLedButtonTask.h"
 #include "configiniread.h"
 #include "driver/gpio.h"
 #include "esp_intr_alloc.h"
@@ -15,9 +14,9 @@
 #define NUM_BUTTON2     1
 #define NUM_BUTTON3     2
 
-uint8_t button1_pin;
-uint8_t button2_pin;
-uint8_t button3_pin;
+int32_t button1_pin;
+int32_t button2_pin;
+int32_t button3_pin;
 
 
 void setupButtonsPinsfromFile();
@@ -25,31 +24,41 @@ void setupPin(uint8_t pin);
 
 
 static void IRAM_ATTR gpio_isr_handler(void *args){
-    int pinNumber = (int)args;
-    ets_printf("ELO %d\n", pinNumber);
-    uint8_t num = 0;
-    if(pinNumber == button1_pin){
+    BaseType_t xHigherPriorityTaskWoken;
+    xHigherPriorityTaskWoken = pdFALSE;
+    xSemaphoreGiveFromISR( buttonTaskSemaphoreH, &xHigherPriorityTaskWoken );
+    portYIELD_FROM_ISR( xHigherPriorityTaskWoken );
+}
+
+void sendButtonNumber(){
+    int32_t num = 0;
+    if(gpio_get_level(button1_pin)){
         num = NUM_BUTTON1;
-        xQueueSendFromISR(queueInteruptButtons, &num, NULL);
-    }else if(pinNumber == button2_pin){
+        xQueueSendFromISR(queueInteruptButtonsH, &num, NULL);
+    }else if(gpio_get_level(button2_pin)){
         num = NUM_BUTTON2;
-        xQueueSendFromISR(queueInteruptButtons, &num, NULL);
-    }else if(pinNumber == button3_pin){
+        xQueueSendFromISR(queueInteruptButtonsH, &num, NULL);
+    }else if(gpio_get_level(button3_pin)){
         num = NUM_BUTTON3;
-        xQueueSendFromISR(queueInteruptButtons, &num, NULL);
+        xQueueSendFromISR(queueInteruptButtonsH, &num, NULL);
     } 
 }
 
+
+///////////////////////////////////
+// Init funs
+///////////////////////////////////
 void setupButtonsPinsfromFile(){
+    printf("But 1 pin: %d, But 2 pin: %d, But 3 pin: %d\n", button1_pin, button2_pin, button3_pin);
     if(getIntConfigFromFile(BUTTON1_INI_TAG, &button1_pin)){
         button1_pin = DEFAULT_BUTTON1_PIN;
-        //printf("PIN 1 Config\n");
     }
     if(getIntConfigFromFile(BUTTON2_INI_TAG, &button2_pin)){
         button2_pin = DEFAULT_BUTTON2_PIN;
     }
     if(getIntConfigFromFile(BUTTON3_INI_TAG, &button3_pin)){
         button3_pin = DEFAULT_BUTTON3_PIN;
+        printf("But 3 pin: %d", button3_pin);
     }
     printf("But 1 pin: %d, But 2 pin: %d, But 3 pin: %d\n", button1_pin, button2_pin, button3_pin);
 }

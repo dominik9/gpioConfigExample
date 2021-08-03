@@ -44,7 +44,8 @@
     "gpio.h": "c",
     "gpio_types.h": "c",
     "freertosconfig.h": "c",
-    "esp_intr_alloc.h": "c"
+    "esp_intr_alloc.h": "c",
+    "ratio": "c"
   },
   "C_Cpp.errorSquiggles": "Disabled"
 }

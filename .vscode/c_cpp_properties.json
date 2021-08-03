@@ -74,7 +74,7 @@
                 "/home/dominik/esp/esp-idf/components/esp_hw_support/include"
             ],
             "defines": [],
-            "cStandard": "c99",
+            "cStandard": "c17",
             "cppStandard": "c++17",
             "intelliSenseMode": "clang-x64"
         }

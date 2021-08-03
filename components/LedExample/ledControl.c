@@ -67,7 +67,8 @@ led_warnings_log setupLed(leds_ini_sw led_num){
             led3.actual_level = 0;
             break;
     }
-    
+    printf("Led 1 pin: %d, Led 2 pin: %d, Led 3 pin: %d\n", led1.led_pin, led2.led_pin, led3.led_pin);
+
     return status;
 }
 

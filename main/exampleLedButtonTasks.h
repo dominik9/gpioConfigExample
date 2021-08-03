@@ -2,11 +2,9 @@
 #define _EXAMPLE_LED_CONROL_H
 
 #include <stdio.h>
-#include "freertos/FreeRTOS.h"
-#include "freertos/queue.h"
 
-extern xQueueHandle queueInteruptButtons;
 
+void buttonTask(void * param);
 void ledTask(void * param); 
 
 #endif

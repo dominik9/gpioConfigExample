@@ -1,12 +1,3 @@
-/*TODO
-Jak to ma wyglądać:
-Inicjalizacja: Czytanie z pliku i sprawdzanie czy jest zawarte w konfiguracji jeżeli nie no to default
-Sprawdzanie czy piny dobrze wpisane (zakres pinów)
-Wyświetlanie błędów
-button z przerwaniem
-Wszystko jako jeden task obsługi ledów 
-Inicjalizacja przez config wszystkich na raz
-*/
 #ifndef _LEDS_CONROL_H
 #define _LEDS_CONROL_H
 
@@ -47,7 +38,7 @@ typedef enum{
 }led_stage;
 
 typedef struct {
-    uint8_t led_pin;
+    int32_t led_pin;
     led_stage stage;
     TimerHandle_t timer_handle;
     uint8_t actual_level;
